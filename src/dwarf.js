@@ -7,7 +7,7 @@
 !function (root) {
 	/* var */
 	var 
-		_head = document.head || document.getElementsByTagName('head')[0] || document.documentElement,
+		_head = document.getElementsByTagName('head')[0],
 		_base,
 		_localBase,
 		_require;
@@ -238,7 +238,7 @@
 		var base = opts.base;
 		function _r(deps, succ, fail) {
 			if (succ) {
-				// This checker have some mistakes
+				// TODO: This checker have some mistakes
 				function _checkDeps() {
 					deps.slice(0).forEach(function (dep, i) {
 						dep = _normalize(base, dep);
@@ -304,7 +304,7 @@
 	 * @param {Function} succ
 	 * @param {Function} fail
 	 */
-	root.require = function () {
+	var require = root.require = function () {
 		if (_require) return _require.apply(root, arguments);
 		Def.make(_base || location.href);
 		if (_base) {
@@ -315,8 +315,8 @@
 		}
 		return _require.apply(root, arguments);
 	}
-	root.require.opt = opt;
-	root.require.makeRequire = makeRequire;
+	require.opt = opt;
+	require.makeRequire = makeRequire;
 	root.define = define;
 
 }(window);
