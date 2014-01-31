@@ -1,0 +1,14 @@
+{
+  "name": "webkit-dwarf",
+  "description": "Another module loader for JavaScript",
+  "version": "0.0.1",
+  "main": "dist/dwarf.js",
+  "author": "Daniel Yang <miniflycn@gmail.com>",
+  "repository": "git://github.com/miniflycn/webkit-dwarf.git",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "0.4.2",
+    "grunt-contrib-uglify": "0.3.2"
+  }
+}
