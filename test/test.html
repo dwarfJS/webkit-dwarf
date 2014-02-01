@@ -1,0 +1,21 @@
+<html>
+	<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="mocha.css" />
+	</head>
+	<body>
+	<div id="mocha"></div>
+	<script src="mocha.js"></script>
+	<script src="should.js"></script>
+	<script>
+		mocha.ui('bdd');
+		mocha.reporter('html');
+	</script>
+	<script src="js/dwarf.js"></script>
+	<script src="test.js"></script>
+	<script>
+	if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+	else { mocha.run(); }
+	</script>
+	</body>
+</html>

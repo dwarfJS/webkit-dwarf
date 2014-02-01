@@ -23,6 +23,13 @@ module.exports = function( grunt ) {
 					}
 				}
 			}
+		},
+		mocha_phantomjs: {
+			options: {
+				'reporter': 'xunit',
+				'output': 'tests/results/result.xml'
+			},
+			all: ['test/*.html']
 		}
 	});
 
