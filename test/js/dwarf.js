@@ -121,7 +121,7 @@
 							loader = new Loader(module, true);
 							Cache.set(module, loader);
 						}
-						return loader.setFactory(factory);
+						return loader.set(factory);
 					});
 				});
 				stack.length = 0;
@@ -175,18 +175,28 @@
 			}
 		},
 		/**
+		 * _push
+		 * @private
+		 * @param {Array} list
+		 * @param {Function} cb
+		 */
+		_push: function (list, cb) {
+			if (!list.some(function (item) { return item === cb }))
+				return list.push(cb);
+		},
+		/**
 		 * succ
 		 * @param {Function} cb
 		 */
 		succ: function (cb) {
-			return this.succList.push(cb);
+			return this._push(this.succList, cb);
 		},
 		/**
 		 * fail
 		 * @param {Function} cb
 		 */
 		fail: function (cb) {
-			return this.failList.push(cb);
+			return this._push(this.failList, cb);
 		},
 		/**
 		 * done
@@ -223,10 +233,10 @@
 			}
 		},
 		/**
-		 * setFactory
+		 * set
 		 * @param {Function} factory
 		 */
-		setFactory: function (factory) {
+		set: function (factory) {
 			this.factory = factory;
 			return this.done();
 		}
@@ -243,7 +253,6 @@
 		var base = opts.base;
 		function _r(deps, succ, fail) {
 			if (succ) {
-				// TODO: This checker have some mistakes
 				function _checkDeps() {
 					deps.slice(0).forEach(function (dep, i) {
 						dep = _normalize(base, dep);
@@ -251,10 +260,10 @@
 						if (!loader) {
 							loader = new Loader(dep);
 							Cache.set(dep, loader);
-							loader.succ(_checkDeps);
-							return loader.fail(fail);
 						}
 						if (loader.loaded) return deps.splice(i, 1);
+						loader.succ(_checkDeps);
+						return loader.fail(fail);
 					});
 					if (!deps.length) return succ();
 				}

@@ -1,5 +1,5 @@
 module.exports = function( grunt ) {
-	"use strict";
+	'use strict';
 
 	grunt.initConfig({
 		uglify: {
@@ -11,7 +11,7 @@ module.exports = function( grunt ) {
 					preserveComments: false,
 					sourceMap: "dist/dwarf.min.map",
 					sourceMappingURL: "dwarf.min.map",
-					report: "min",
+					report: "gzip",
 					beautify: {
 						ascii_only: true
 					},
@@ -24,6 +24,13 @@ module.exports = function( grunt ) {
 				}
 			}
 		},
+		copy: {
+			test: {
+				files: [
+					{expand: true, cwd: 'src/', src: ['*'], dest: 'test/js/'}
+				]
+			}
+		},
 		mocha_phantomjs: {
 			options: {
 				'reporter': 'xunit',
@@ -33,8 +40,9 @@ module.exports = function( grunt ) {
 		}
 	});
 
-	// Load grunt tasks from NPM packages
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-mocha-phantomjs');
 
-	grunt.registerTask("default", [ "uglify" ]);
+	grunt.registerTask('default', ['uglify', 'copy', 'mocha_phantomjs']);
 };
