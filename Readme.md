@@ -1,5 +1,6 @@
 webkit-dwarf
 ============
+[![build status](https://secure.travis-ci.org/miniflycn/webkit-dwarf.png)](http://travis-ci.org/miniflycn/webkit-dwarf)
 
 What the Fuck?
 --------------
