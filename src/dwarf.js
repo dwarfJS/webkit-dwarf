@@ -10,8 +10,7 @@
 		_head = document.getElementsByTagName('head')[0],
 		_base,
 		_localBase,
-		_require,
-		_uid = 0;
+		_require;
 
 	/* Tool */
 	function _isFunction(f) {
