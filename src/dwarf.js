@@ -10,7 +10,8 @@
 		_head = document.getElementsByTagName('head')[0],
 		_base,
 		_localBase,
-		_require;
+		_require
+		_uid = 0;
 
 	/* Tool */
 	function _isFunction(f) {
@@ -121,7 +122,7 @@
 							loader = new Loader(module, true);
 							Cache.set(module, loader);
 						}
-						return loader.set(factory);
+						return !loader.loaded && loader.set(factory);
 					});
 				});
 				stack.length = 0;
@@ -180,23 +181,23 @@
 		 * @param {Array} list
 		 * @param {Function} cb
 		 */
-		_push: function (list, cb) {
+		_unshift: function (list, cb) {
 			if (!list.some(function (item) { return item === cb }))
-				return list.push(cb);
+				return list.unshift(cb);
 		},
 		/**
 		 * succ
 		 * @param {Function} cb
 		 */
 		succ: function (cb) {
-			return this._push(this.succList, cb);
+			return this._unshift(this.succList, cb);
 		},
 		/**
 		 * fail
 		 * @param {Function} cb
 		 */
 		fail: function (cb) {
-			return this._push(this.failList, cb);
+			return this._unshift(this.failList, cb);
 		},
 		/**
 		 * done
@@ -254,18 +255,29 @@
 		function _r(deps, succ, fail) {
 			if (succ) {
 				function _checkDeps() {
-					deps.slice(0).forEach(function (dep, i) {
-						dep = _normalize(base, dep);
-						var loader = Cache.get(dep);
+					var res = [];
+					deps.forEach(function (dep, i) {
+						var 
+							path = _normalize(base, dep),
+							loader = Cache.get(path);
 						if (!loader) {
-							loader = new Loader(dep);
-							Cache.set(dep, loader);
+							loader = new Loader(path);
+							Cache.set(path, loader);
 						}
-						if (loader.loaded) return deps.splice(i, 1);
+						if (loader.loaded) {
+							return;
+						} else {
+							res.push(dep);
+						}
 						loader.succ(_checkDeps);
-						return loader.fail(fail);
+						fail && loader.fail(fail);
 					});
-					if (!deps.length) return succ();
+					deps = res;
+					// make sure success callback will not trigger multiple times
+					if (!deps.length && !succ.fired) {
+						succ.fired = true;
+						succ();
+					}
 				}
 				_checkDeps();
 			} else {
