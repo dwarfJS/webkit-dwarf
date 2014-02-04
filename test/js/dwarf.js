@@ -252,6 +252,7 @@
 	function makeRequire(opts) {
 		var base = opts.base;
 		function _r(deps, succ, fail) {
+			var fired;
 			if (succ) {
 				function _checkDeps() {
 					var res = [];
@@ -273,8 +274,8 @@
 					});
 					deps = res;
 					// make sure success callback will not trigger multiple times
-					if (!deps.length && !succ.fired) {
-						succ.fired = true;
+					if (!deps.length && !fired) {
+						fired = true;
 						succ();
 					}
 				}
