@@ -1,0 +1,1 @@
+define('./hello', 'hello world!');

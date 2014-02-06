@@ -28,4 +28,22 @@ describe('require', function () {
 			done();
 		});
 	});
+
+	var myRequire = require.makeRequire({ base: location.href.replace('/test.html', '/mod/') });
+
+	it('should able to make a require', function (done) {
+		myRequire(['./math/add'], function () {
+			var add = myRequire('./math/add');
+			add(1, 3).should.equal(4);
+			done();
+		});
+	});
+
+	it('should able to get hello module', function (done) {
+		myRequire(['./hello/hello'], function () {
+			var hello = myRequire('./hello/hello');
+			hello.should.equal('hello world!');
+			done();
+		});
+	});
 });
