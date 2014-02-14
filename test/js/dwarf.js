@@ -10,7 +10,10 @@
 		_head = document.getElementsByTagName('head')[0],
 		_base,
 		_localBase,
-		_require;
+		_require,
+		DOT_RE = /\/\.\//g,
+		DOUBLE_DOT_RE = /\/[^/]+\/\.\.\//,
+		DOUBLE_SLASH_RE = /([^:/])\/\//g;
 
 	/* Tool */
 	function _isFunction(f) {
@@ -30,32 +33,14 @@
 		return (path + '').indexOf('.') === 0;
 	}
 
+	// reference from seajs
 	function _resolvePath(base, path) {
-		var 
-			bArr = base.split('/'),
-			pArr = path.split('/'),
-			part;
-		bArr.pop();
-		while (pArr.length) {
-			part = pArr.shift();
-			if (part == '..') {
-				if (bArr.length) {
-					part = bArr.pop();
-					while (part == '.') {
-						part = bArr.pop();
-					}
-					if (part == '..') {
-						bArr.push('..', '..');
-					}
-				} else {
-					bArr.push(part);
-				}
-			} else if (part != '.') {
-				bArr.push(part);
-			}
+		path = base.substring(0, base.lastIndexOf('/') + 1) + path;
+		path = path.replace(DOT_RE, '/');
+		while (path.match(DOUBLE_DOT_RE)) {
+			path = path.replace(DOUBLE_DOT_RE, '/');
 		}
-		path = bArr.join('/');
-		return path;
+		return path = path.replace(DOUBLE_SLASH_RE, '$1/');
 	}
 
 	/* Class */
