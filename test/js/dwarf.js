@@ -14,9 +14,7 @@
 		_require,
 		DOT_RE = /\/\.\//g,
 		DOUBLE_DOT_RE = /\/[^/]+\/\.\.\//,
-		DOUBLE_SLASH_RE = /([^:/])\/\//g,
-		IS_PATH = /^\.|\//,
-		IS_URL = /(^https?|^file):\/\//;
+		DOUBLE_SLASH_RE = /([^:/])\/\//g;
 
 	/* Tool */
 	function _isFunction(f) {
@@ -26,12 +24,11 @@
 	function _normalize(base, id) {
 		if (_isUnnormalId(id)) return id;
 		if (_isRelativePath(id)) return _resolvePath(base, id) + '.js';
-		if (id = _path[id]) return id;
-		throw new Error('url must not correct!');
+		return id;
 	}
 
 	function _isUnnormalId(id) {
-		return (/^https?:|^\/|.js$/).test(id);
+		return (/^https?:|^file:|^\/|.js$/).test(id);
 	}
 
 	function _isRelativePath(path) {
@@ -40,16 +37,12 @@
 
 	// reference from seajs
 	function _resolvePath(base, path) {
-		if (IS_PATH.test(path)) {
-			path = base.substring(0, base.lastIndexOf('/') + 1) + path;
-			path = path.replace(DOT_RE, '/');
-			while (path.match(DOUBLE_DOT_RE)) {
-				path = path.replace(DOUBLE_DOT_RE, '/');
-			}
-			return path = path.replace(DOUBLE_SLASH_RE, '$1/');
-		} else {
-			return path;
+		path = base.substring(0, base.lastIndexOf('/') + 1) + path;
+		path = path.replace(DOT_RE, '/');
+		while (path.match(DOUBLE_DOT_RE)) {
+			path = path.replace(DOUBLE_DOT_RE, '/');
 		}
+		return path = path.replace(DOUBLE_SLASH_RE, '$1/');
 	}
 
 	/* Class */
@@ -129,6 +122,7 @@
 	 * @param {String} url
 	 */
 	function Loader(url, prevent) {
+		_isUnnormalId(url) || (url = _path[url]);
 		!prevent && this.load(url);
 		this.path = url;
 		this.succList = [];
