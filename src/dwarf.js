@@ -9,11 +9,14 @@
 	var 
 		_head = document.getElementsByTagName('head')[0],
 		_base,
+		_path = {},
 		_localBase,
 		_require,
 		DOT_RE = /\/\.\//g,
 		DOUBLE_DOT_RE = /\/[^/]+\/\.\.\//,
-		DOUBLE_SLASH_RE = /([^:/])\/\//g;
+		DOUBLE_SLASH_RE = /([^:/])\/\//g,
+		IS_PATH = /^\.|\//,
+		IS_URL = /(^https?|^file):\/\//;
 
 	/* Tool */
 	function _isFunction(f) {
@@ -35,12 +38,16 @@
 
 	// reference from seajs
 	function _resolvePath(base, path) {
-		path = base.substring(0, base.lastIndexOf('/') + 1) + path;
-		path = path.replace(DOT_RE, '/');
-		while (path.match(DOUBLE_DOT_RE)) {
-			path = path.replace(DOUBLE_DOT_RE, '/');
+		if (IS_PATH.test(path)) {
+			path = base.substring(0, base.lastIndexOf('/') + 1) + path;
+			path = path.replace(DOT_RE, '/');
+			while (path.match(DOUBLE_DOT_RE)) {
+				path = path.replace(DOUBLE_DOT_RE, '/');
+			}
+			return path = path.replace(DOUBLE_SLASH_RE, '$1/');
+		} else {
+			return path;
 		}
-		return path = path.replace(DOUBLE_SLASH_RE, '$1/');
 	}
 
 	/* Class */
@@ -120,6 +127,8 @@
 	 * @param {String} url
 	 */
 	function Loader(url, prevent) {
+		IS_URL.test(url) || (url = _path[url]);
+		if (!url) throw new Error('url is not correct!');
 		!prevent && this.load(url);
 		this.path = url;
 		this.succList = [];
@@ -306,6 +315,7 @@
 
 	function opt(opts) {
 		_base = (opts.base === undefined ? _base : opts.base);
+		_path = opts.path || _path;
 	}
 
 	/**
