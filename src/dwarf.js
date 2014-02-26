@@ -26,6 +26,8 @@
 	function _normalize(base, id) {
 		if (_isUnnormalId(id)) return id;
 		if (_isRelativePath(id)) return _resolvePath(base, id) + '.js';
+		if (id = _path[id]) return id;
+		throw new Error('url must not correct!');
 	}
 
 	function _isUnnormalId(id) {
@@ -127,8 +129,6 @@
 	 * @param {String} url
 	 */
 	function Loader(url, prevent) {
-		IS_URL.test(url) || (url = _path[url]);
-		if (!url) throw new Error('url is not correct!');
 		!prevent && this.load(url);
 		this.path = url;
 		this.succList = [];
