@@ -146,7 +146,7 @@
 			_head.appendChild(node);
 			function _onload() {
 				_onend();
-				return Def.make(this.src);
+				return Def.make(self.path);
 			}
 			function _onerror() {
 				_onend();
