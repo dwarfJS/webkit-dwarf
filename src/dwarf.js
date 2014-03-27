@@ -28,7 +28,7 @@
 	}
 
 	function _isUnnormalId(id) {
-		return (/^https?:|^file:|^\/|.js$/).test(id);
+		return (/^https?:|^file:|^\/|\.js$/).test(id);
 	}
 
 	function _isRelativePath(path) {
@@ -264,7 +264,8 @@
 					// make sure success callback will not trigger multiple times
 					if (!deps.length && !fired) {
 						fired = true;
-						succ();
+						// This is a way to prevent emit too quick for multi module in one file
+						setTimeout(succ, 0);
 					}
 				}
 				_checkDeps();
