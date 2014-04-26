@@ -149,3 +149,9 @@ require.opt({ base: 'http://qun.qq.com/js/' });
 ```
 var myRequire = require.makeRequire({ base: 'http://qun.qq.com/js/' });
 ```
+
+应用项目
+--------
+
+* 群公告PC版
+* 群公告手Q版
