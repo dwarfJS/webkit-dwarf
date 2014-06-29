@@ -28,7 +28,7 @@
 	}
 
 	function _isUnnormalId(id) {
-		return (/^https?:|^file:|^\/|.js$/).test(id);
+		return (/^https?:|^file:|^\/|\.js$/).test(id);
 	}
 
 	function _isRelativePath(path) {
@@ -109,7 +109,7 @@
 							Cache.set(module, loader);
 						}
 						return !loader.loaded && loader.set(factory);
-					});
+					}, 0, true);
 				});
 				stack.length = 0;
 			}
@@ -239,7 +239,7 @@
 	 */
 	function makeRequire(opts) {
 		var base = opts.base;
-		function _r(deps, succ, fail) {
+		function _r(deps, succ, fail, sync) {
 			var fired;
 			if (succ) {
 				function _checkDeps() {
@@ -264,7 +264,10 @@
 					// make sure success callback will not trigger multiple times
 					if (!deps.length && !fired) {
 						fired = true;
-						succ();
+						// This is a way to prevent emit too quick for multi module in one file
+						sync ?
+							succ() :
+							setTimeout(succ, 0);
 					}
 				}
 				_checkDeps();
