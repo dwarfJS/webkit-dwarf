@@ -1,7 +1,7 @@
 {
   "name": "webkit-dwarf",
   "description": "Another module loader for JavaScript",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "dist/dwarf.min.js",
   "author": "Daniel Yang <miniflycn@gmail.com>",
   "repository": "git://github.com/miniflycn/webkit-dwarf.git",
