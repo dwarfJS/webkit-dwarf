@@ -98,16 +98,25 @@
 			 */
 			make: function (src) {
 				stack.forEach(function (o) {
-					var 
-						module = _normalize(src, o.m),
-						deps = o.d,
-						factory = o.f;
-					return makeRequire({ base: src })(deps, function () {
-						var loader = Cache.get(module);
-						if (!loader) {
-							loader = new Loader(module, true);
-							Cache.set(module, loader);
-						}
+
+                    var module = o.m = _normalize(src, o.m);
+
+                    var loader = Cache.get(module);
+                    if (!loader) {
+                        loader = new Loader(module, true);
+                        Cache.set(module, loader);
+                    }
+                });
+                stack.forEach(function (o) {
+                    var
+                        module = o.m,
+                        deps = o.d,
+                        factory = o.f,
+                        base = ~module.indexOf('/') ?
+                            module.replace(/[^\/]+$/, '') :
+                            _path[module].replace(/[^\/]+$/, '');
+                    return makeRequire({ base: base })(deps, function () {
+                        var loader = Cache.get(module);
 						return !loader.loaded && loader.set(factory);
 					}, 0, true);
 				});
@@ -230,6 +239,13 @@
 		}
 	}
 
+    function _makeModules(modules, r) {
+        var mods = [];
+        modules.forEach(function (module) {
+            mods.push(r(module));
+        });
+        return mods;
+    }
 	/* returns */
 
 	/**
@@ -240,37 +256,39 @@
 	function makeRequire(opts) {
 		var base = opts.base;
 		function _r(deps, succ, fail, sync) {
-			var fired;
-			if (succ) {
-				function _checkDeps() {
-					var res = [];
-					deps.forEach(function (dep, i) {
-						var 
-							path = _normalize(base, dep),
-							loader = Cache.get(path);
-						if (!loader) {
-							loader = new Loader(path);
-							Cache.set(path, loader);
-						}
-						if (loader.loaded) {
-							return;
-						} else {
-							res.push(dep);
-						}
-						loader.succ(_checkDeps);
-						fail && loader.fail(fail);
-					});
-					deps = res;
-					// make sure success callback will not trigger multiple times
-					if (!deps.length && !fired) {
-						fired = true;
-						// This is a way to prevent emit too quick for multi module in one file
-						sync ?
-							succ() :
-							setTimeout(succ, 0);
-					}
-				}
-				_checkDeps();
+            var fired, self = this, _deps = deps.slice(0);
+            if (succ) {
+                function _checkDeps() {
+                    var res = [];
+                    deps.forEach(function (dep, i) {
+                        var
+                            path = _normalize(base, dep),
+                            loader = Cache.get(path);
+                        if (!loader) {
+                            loader = new Loader(path);
+                            Cache.set(path, loader);
+                        }
+                        if (loader.loaded) {
+                            return;
+                        } else {
+                            res.push(dep);
+                        }
+                        loader.succ(_checkDeps);
+                        fail && loader.fail(fail);
+                    });
+                    deps = res;
+                    // make sure success callback will not trigger multiple times
+                    if (!deps.length && !fired) {
+                        fired = true;
+                        // This is a way to prevent emit too quick for multi module in one file
+                        sync ?
+                            succ() :
+                            setTimeout(function () {
+                                succ.apply(self, _makeModules(_deps, _r));
+                            }, 0);
+                    }
+                }
+                _checkDeps();
 			} else {
 				var 
 					path = _normalize(base, deps),
@@ -309,6 +327,9 @@
 			f: factory
 		});
 	}
+    define.amd = {
+        jQuery: true
+    };
 
 	function opt(opts) {
 		_base = (opts.base === undefined ? _base : opts.base);
